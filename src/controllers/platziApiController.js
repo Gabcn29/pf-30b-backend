@@ -8,10 +8,10 @@ const rellenarBase = async (req, res) => {
     .then(async (answer) => {
       for (let i = 0; i < answer.length; i++) {
         const newItem = await Article.create({
-          title: data[i].title,
-          images: data[i].images,
-          price: data[i].price,
-          description: data[i].description,
+          title: answer[i].title,
+          images: answer[i].images,
+          price: answer[i].price,
+          description: answer[i].description,
           stock: Math.floor(Math.random() * 100),
           categoryId: null,
         });
