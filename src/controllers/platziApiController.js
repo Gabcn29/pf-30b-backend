@@ -8,7 +8,10 @@ const rellenarBase = async (req, res) => {
     .then(async (answer) => {
       for (let i = 0; i < answer.length; i++) {
         const newItem = await Article.create({
-          ...answer[i],
+          title: data[i].title,
+          images: data[i].images,
+          price: data[i].price,
+          description: data[i].description,
           stock: Math.floor(Math.random() * 100),
           categoryId: null,
         });
@@ -17,10 +20,16 @@ const rellenarBase = async (req, res) => {
         if (!checkCategory) {
           const newCategory = await Category.create({ ...answer[i].category });
           await newCategory.addArticle(newItem.id);
-          await Article.update({ categoryId: newCategory.id }, { where: { id: newItem.id } });
+          await Article.update(
+            { categoryId: newCategory.id },
+            { where: { id: newItem.id } }
+          );
         } else {
           await checkCategory.addArticle(newItem.id);
-          await Article.update({ categoryId: checkCategory.id }, { where: { id: newItem.id } });
+          await Article.update(
+            { categoryId: checkCategory.id },
+            { where: { id: newItem.id } }
+          );
         }
       }
     })
