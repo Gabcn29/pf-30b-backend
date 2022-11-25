@@ -6,6 +6,7 @@ const rellenarBase = async (req, res) => {
   })
     .then((data) => data.json())
     .then(async (answer) => {
+      console.log(answer.length);
       for (let i = 0; i < answer.length; i++) {
         const newItem = await Article.create({
           title: answer[i].title,
