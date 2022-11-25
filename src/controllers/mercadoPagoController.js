@@ -1,6 +1,8 @@
 const mercadopago = require("mercadopago");
 require("dotenv").config();
+var request = require("request");
 const { MP_ACCESS_TOKEN } = process.env;
+const { Factura, User, Article } = require("../db.js");
 
 mercadopago.configure({
   access_token: MP_ACCESS_TOKEN,
@@ -32,6 +34,35 @@ const createOrder = async (req, res) => {
     });
 };
 
+const checkPurchase = async (req, res) => {
+  const { id } = req.params;
+  if (id === null) {
+    res.status(500).json({ estado: "error" });
+  } else {
+    const a = await request(`https://api.mercadopago.com/v1/payments/${id}/?access_token=${process.env.MP_ACCESS_TOKEN}`, async function (e, r, b) {
+      const a = JSON.parse(b);
+
+      const check = await Factura.findOne({ where: { transaction_id: id } });
+      if (!check) {
+        const newItem = await Factura.create({ transaction_id: id, total: a.transaction_details.total_paid_amount, payment_status: a.status, payment_method: a.payment_method_id });
+        const comprador = await User.findOne({ where: { email: a.external_reference } });
+        await comprador.addFactura(newItem.id);
+        await newItem.setUser(comprador.id);
+        let array = [];
+        for (let i = 0; i < a.additional_info.items.length; i++) {
+          await newItem.addArticle(a.additional_info.items[i].id);
+          array.push(a.additional_info.items[i].quantity);
+        }
+        await Factura.update({ quantity: array }, { where: { id: newItem.id } });
+      }
+
+      const compra = await Factura.findOne({ where: { transaction_id: id }, include: Article });
+      res.status(200).json({ compra, estado: a.status });
+    });
+  }
+};
+
 module.exports = {
   createOrder,
+  checkPurchase,
 };

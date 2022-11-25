@@ -31,11 +31,18 @@ sequelize.models = Object.fromEntries(capsEntries);
 const { Article } = sequelize.models;
 const { Category } = sequelize.models;
 
+const { User } = sequelize.models;
+const { Factura } = sequelize.models;
+
 // Aca vendrian las relaciones
 // Product.hasMany(Reviews);
 
 Category.belongsToMany(Article, { through: "Enrollment" });
 Article.belongsTo(Category, { through: "Enrollment" });
+
+Factura.belongsTo(User, { through: "bill" });
+User.belongsToMany(Factura, { through: "bill" });
+Factura.belongsToMany(Article, { through: "billitems" });
 
 module.exports = {
   ...sequelize.models, // para poder importar los modelos así: const { Product, User } = require('./db.js');
