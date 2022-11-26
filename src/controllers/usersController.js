@@ -20,10 +20,10 @@ const checkGoogleFacebook = async (req, res) => {
   //asi que tenes que encontrar una combinacion que haseada de el string de sub
 
   if (check) {
-    res.status(200);
+    res.status(200).json({ created: false });
   } else {
     const newItem = await User.create({ nickname, email, password: sub });
-    res.status(200);
+    res.status(200).json({ created: true });
   }
 };
 
