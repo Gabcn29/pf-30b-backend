@@ -14,10 +14,26 @@ const getOne = async (req, res) => {
 const createItem = async (req, res) => {
   const { category } = req.body;
   try {
-    const checkCategory = await Category.findByPk(category.id);
-    if (!checkCategory) {
+    const checkCategoryByPk = await Category.findByPk(category.id);
+    const checkCategoryByName = await Category.findOne({
+      where: {
+        name: category.name,
+      },
+    });
+    const checkItem = await Article.findOne({
+      where: {
+        title: req.body.title,
+      },
+    });
+    if (checkItem) {
+      return res
+        .status(400)
+        .json({ message: "An article with that name already exists" });
+    }
+    if (!checkCategoryByPk && !checkCategoryByName) {
       await Category.create({
-        ...category,
+        name: category.name,
+        image: category.image,
       });
     }
     const newItem = await Article.create({
@@ -25,17 +41,21 @@ const createItem = async (req, res) => {
       price: parseFloat(req.body.precio),
     });
 
-    const articleCategory = await Category.findByPk(category.id);
+    const articleCategory = await Category.findOne({
+      where: {
+        name: category.name,
+      },
+    });
     await articleCategory.addArticle(newItem.id);
     await Article.update(
       { categoryId: articleCategory.id },
       { where: { id: newItem.id } }
     );
 
-    res.status(200).json(newItem);
+    return res.status(200).json(newItem);
   } catch (e) {
     console.log(e);
-    res.status(500).json(e);
+    return res.status(500).json(e);
   }
 };
 
@@ -54,7 +74,7 @@ const updateItem = async (req, res) => {
       await findArticle.update({
         title,
         images,
-        price,
+        price: parseFloat(price),
         description,
         stock,
       });
