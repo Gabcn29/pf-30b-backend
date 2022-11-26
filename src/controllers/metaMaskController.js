@@ -1,5 +1,5 @@
 require("dotenv").config();
-const { Factura, User, Article } = require("../db.js");
+const { Factura, User, Article, Billitems } = require("../db.js");
 const { METAMASK_API_TOKEN } = process.env;
 
 const createOrder = async (req, res) => {
@@ -9,12 +9,11 @@ const createOrder = async (req, res) => {
   const comprador = await User.findOne({ where: { email: email } });
   await comprador.addFactura(newItem.id);
   await newItem.setUser(comprador.id);
-  let array = [];
+
   for (let i = 0; i < carro.length; i++) {
-    await newItem.addArticle(carro[i].id);
-    array.push(carro[i].quantity);
+    await newItem.addArticle(carro[i].id, { through: { quantity: carro[i].quantity } });
   }
-  await Factura.update({ quantity: array }, { where: { id: newItem.id } });
+
   const compra = await Factura.findOne({ where: { transaction_id: txHash }, include: Article });
   res.status(200).json(compra);
 };

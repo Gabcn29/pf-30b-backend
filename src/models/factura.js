@@ -25,10 +25,6 @@ module.exports = (sequelize) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      quantity: {
-        type: DataTypes.ARRAY(DataTypes.INTEGER),
-        allowNull: true,
-      },
     },
     {
       timestamps: true,

@@ -2,7 +2,7 @@ const mercadopago = require("mercadopago");
 require("dotenv").config();
 var request = require("request");
 const { MP_ACCESS_TOKEN } = process.env;
-const { Factura, User, Article } = require("../db.js");
+const { Factura, User, Article, Billitems } = require("../db.js");
 
 mercadopago.configure({
   access_token: MP_ACCESS_TOKEN,
@@ -48,12 +48,9 @@ const checkPurchase = async (req, res) => {
         const comprador = await User.findOne({ where: { email: a.external_reference } });
         await comprador.addFactura(newItem.id);
         await newItem.setUser(comprador.id);
-        let array = [];
         for (let i = 0; i < a.additional_info.items.length; i++) {
-          await newItem.addArticle(a.additional_info.items[i].id);
-          array.push(a.additional_info.items[i].quantity);
+          await newItem.addArticle(a.additional_info.items[i].id, { through: { quantity: a.additional_info.items[i].quantity } });
         }
-        await Factura.update({ quantity: array }, { where: { id: newItem.id } });
       }
 
       const compra = await Factura.findOne({ where: { transaction_id: id }, include: Article });
