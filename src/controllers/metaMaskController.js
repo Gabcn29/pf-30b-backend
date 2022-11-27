@@ -19,12 +19,21 @@ const createOrder = async (req, res) => {
 };
 
 const checkPurchase = async (req, res) => {
-  const factura = await Factura.findByPk(req.params.id);
+  const factura = await Factura.findByPk(req.params.id, { include: Article });
 
   if (factura && factura.payment_method === "MetaMask")
     await fetch(`https://api-goerli.etherscan.io/api?module=transaction&action=gettxreceiptstatus&txhash=${factura.transaction_id}&apikey=${METAMASK_API_TOKEN}`, { method: "GET" })
       .then((data) => data.json())
-      .then((answer) => res.status(200).json(answer));
+      .then(async (answer) => {
+        res.status(200).json(answer);
+        if (answer.result.status === "1" && !factura.stockChanged) {
+          await factura.update({ stockChanged: true });
+          for (let i = 0; i < factura.articles.length; i++) {
+            const articulo = await Article.findByPk(factura.articles[i].id);
+            await articulo.update({ stock: articulo.stock - factura.articles[i].billitems.quantity });
+          }
+        }
+      });
   else res.status(500).json({ error: "Esta factura no existe o no es de metamask" });
 };
 

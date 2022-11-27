@@ -55,6 +55,14 @@ const checkPurchase = async (req, res) => {
 
       const compra = await Factura.findOne({ where: { transaction_id: id }, include: Article });
       res.status(200).json({ compra, estado: a.status });
+
+      if (compra.payment_status === "approved" && !compra.stockChanged) {
+        await compra.update({ stockChanged: true });
+        for (let i = 0; i < compra.articles.length; i++) {
+          const articulo = await Article.findByPk(compra.articles[i].id);
+          await articulo.update({ stock: articulo.stock - compra.articles[i].billitems.quantity });
+        }
+      }
     });
   }
 };
