@@ -17,9 +17,16 @@ const rellenarBase = async (req, res) => {
           categoryId: null,
         });
 
-        const checkCategory = await Category.findByPk(answer[i].category.id);
+        const checkCategory = await Category.findOne({
+          where: {
+            name: answer[i].category.name
+          }
+        });
         if (!checkCategory) {
-          const newCategory = await Category.create({ ...answer[i].category });
+          const newCategory = await Category.create({
+            name: answer[i].category.name,
+            image: answer[i].category.image,
+          });
           await newCategory.addArticle(newItem.id);
           await Article.update(
             { categoryId: newCategory.id },
