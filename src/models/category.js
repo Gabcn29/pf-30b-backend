@@ -7,6 +7,7 @@ module.exports = (sequelize) => {
       id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
+        autoIncrement: true,
       },
       name: {
         type: DataTypes.STRING,
@@ -18,7 +19,6 @@ module.exports = (sequelize) => {
       },
     },
     {
-      timestamps: false,
       paranoid: true,
     }
   );

@@ -4,7 +4,7 @@ const { DataTypes } = require("sequelize");
 module.exports = (sequelize) => {
   // defino el modelo
   sequelize.define(
-    "auth0users",
+    "user",
     {
       id: {
         type: DataTypes.INTEGER,
@@ -26,6 +26,7 @@ module.exports = (sequelize) => {
     },
     {
       timestamps: false,
+      paranoid: true,
     }
   );
 };

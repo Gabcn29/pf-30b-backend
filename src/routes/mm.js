@@ -1,5 +1,5 @@
 const express = require("express");
-const { createOrder, checkPurchase } = require("../controllers/mercadoPagoController.js");
+const { createOrder, checkPurchase } = require("../controllers/metaMaskController.js");
 
 const router = express.Router();
 
