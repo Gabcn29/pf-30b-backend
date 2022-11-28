@@ -1,11 +1,12 @@
 const { Category } = require("../db.js");
+const { Op } = require("sequelize");
 
 const getAll = async (req, res) => {
   const categorias = await Category.findAll();
   if (categorias.length === 0) {
     return res
       .status(404)
-      .json({ message: "No categories available on the database available" });
+      .json({ message: "No categories available on the database" });
   }
   return res.status(200).json(categorias);
 };
@@ -52,7 +53,7 @@ const createCategory = async (req, res) => {
 
 const modifyCategory = async (req, res) => {
   const { name, image } = req.body;
-  const { id } = req.query;
+  const { id } = req.params;
   if (isNaN(id))
     return res.status(400).json({ messsage: "ID must be a number" });
   try {
@@ -87,7 +88,7 @@ const modifyCategory = async (req, res) => {
 };
 
 const deleteCategory = async (req, res) => {
-  const { id } = req.query;
+  const { id } = req.params;
   if (isNaN(id))
     return res.status(400).json({ message: "ID must be a number" });
   try {
@@ -106,10 +107,40 @@ const deleteCategory = async (req, res) => {
   }
 };
 
+const restoreCategory = async (req, res) => {
+  const { id } = req.params;
+  if (isNaN(id))
+    return res.status(400).json({ message: "ID must be a number" });
+  try {
+    const deletedCategory = await Category.findOne({
+      where: {
+        id: id,
+        [Op.not]: [{ deletedAt: null }],
+      },
+      paranoid: false,
+    });
+    if (deletedCategory) {
+      await deletedCategory.restore();
+      return res
+        .status(200)
+        .json({ message: "Category restored successfully", deletedCategory });
+    } else {
+      return res.status(404).json({
+        message:
+          "Category with that ID could not be found or is already restored",
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json(error);
+  }
+};
+
 module.exports = {
   getAll,
   getOne,
   createCategory,
   modifyCategory,
   deleteCategory,
+  restoreCategory,
 };
