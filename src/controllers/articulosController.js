@@ -1,14 +1,48 @@
 const { Article, Category } = require("../db.js");
+const { Op } = require("sequelize");
 
 const getAll = async (req, res) => {
   const articulos = await Article.findAll({ include: Category });
   const categorias = await Category.findAll();
-  return res.status(200).json({ articulos, categorias });
+  const deletedArticles = await Article.findAll({
+    where: {
+      [Op.not]: [{ deletedAt: null }],
+    },
+    paranoid: false,
+  });
+  const deletedCategories = await Category.findAll({
+    where: {
+      [Op.not]: [{ deletedAt: null }],
+    },
+    paranoid: false,
+  });
+  return res
+    .status(200)
+    .json({ articulos, deletedArticles, categorias, deletedCategories });
 };
 
 const getOne = async (req, res) => {
-  const articulo = await Article.findByPk(req.params.id, { include: Category });
-  return res.status(200).json(articulo);
+  const { id } = req.params;
+  if (isNaN(id))
+    return res.status(400).json({ message: "ID must be a number" });
+  try {
+    const articulo = await Article.findByPk(id, { include: Category });
+    const deletedArticle = await Article.findByPk(id, { paranoid: false });
+    if (articulo) {
+      return res.status(200).json({ message: "Article is active", articulo });
+    } else if (deletedArticle) {
+      return res
+        .status(200)
+        .json({ message: "Article is deleted", deletedArticle });
+    } else {
+      return res
+        .status(404)
+        .json({ message: "Article with that ID could not be found" });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json(error);
+  }
 };
 
 const createItem = async (req, res) => {
@@ -61,7 +95,7 @@ const createItem = async (req, res) => {
 
 const updateItem = async (req, res) => {
   const { title, images, price, description, stock } = req.body;
-  const { id } = req.query;
+  const { id } = req.params;
   if (isNaN(id))
     return res.status(400).json({ message: "ID must be a number" });
   try {
@@ -93,7 +127,7 @@ const updateItem = async (req, res) => {
 };
 
 const deleteItem = async (req, res) => {
-  const { id } = req.query;
+  const { id } = req.params;
   if (isNaN(id))
     return res.status(400).json({ message: "ID must be a number" });
   try {
@@ -114,10 +148,39 @@ const deleteItem = async (req, res) => {
   }
 };
 
+const restoreItem = async (req, res) => {
+  const { id } = req.params;
+  if (isNaN(id))
+    return res.status(400).json({ message: "ID must be a number" });
+  try {
+    const deletedArticle = await Article.findOne({
+      where: {
+        id: id,
+        [Op.not]: [{ deletedAt: null }],
+      },
+      paranoid: false,
+    });
+    if (deletedArticle) {
+      await deletedArticle.restore();
+      return res
+        .status(200)
+        .json({ message: "Article restored successfully", deletedArticle });
+    } else {
+      return res
+        .status(404)
+        .json({ message: "Article with that ID could not be found or is already restored" });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json(error);
+  }
+};
+
 module.exports = {
   getAll,
   getOne,
   createItem,
   updateItem,
   deleteItem,
+  restoreItem,
 };
