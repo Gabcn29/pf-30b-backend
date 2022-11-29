@@ -5,6 +5,7 @@ const {
   createItem,
   updateItem,
   deleteItem,
+  restoreItem,
 } = require("../controllers/articulosController.js");
 
 const router = express.Router();
@@ -12,7 +13,8 @@ const router = express.Router();
 router.get("/getAll", getAll);
 router.get("/:id", getOne);
 router.post("/create", createItem);
-router.put("/modify", updateItem);
-router.delete("/delete", deleteItem);
+router.put("/modify/:id", updateItem);
+router.delete("/delete/:id", deleteItem);
+router.get("/restore/:id", restoreItem);
 
 module.exports = router;
