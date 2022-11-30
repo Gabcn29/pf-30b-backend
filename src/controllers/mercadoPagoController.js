@@ -14,9 +14,9 @@ const createOrder = async (req, res) => {
     auto_return: "approved",
     external_reference: req.body.user.email,
     back_urls: {
-      success: "http://localhost:3000/successBuy",
-      pending: "http://localhost:3000/pending",
-      failure: "http://localhost:3000/cart",
+      success: "https://ecommerce-frontend-30b.vercel.app/successBuy",
+      pending: "https://ecommerce-frontend-30b.vercel.app/pending",
+      failure: "https://ecommerce-frontend-30b.vercel.app/cart",
     },
   };
 
