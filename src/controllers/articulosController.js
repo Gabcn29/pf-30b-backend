@@ -94,7 +94,7 @@ const createItem = async (req, res) => {
 };
 
 const updateItem = async (req, res) => {
-  const { title, images, price, description, stock } = req.body;
+  const { title, images, price, properties, stock } = req.body;
   const { id } = req.params;
   if (isNaN(id))
     return res.status(400).json({ message: "ID must be a number" });
@@ -109,7 +109,7 @@ const updateItem = async (req, res) => {
         title,
         images,
         price: parseFloat(price),
-        description,
+        properties,
         stock,
       });
       return res.status(200).json({
@@ -166,13 +166,228 @@ const restoreItem = async (req, res) => {
         .status(200)
         .json({ message: "Article restored successfully", deletedArticle });
     } else {
-      return res
-        .status(404)
-        .json({ message: "Article with that ID could not be found or is already restored" });
+      return res.status(404).json({
+        message:
+          "Article with that ID could not be found or is already restored",
+      });
     }
   } catch (error) {
     console.log(error);
     return res.status(500).json(error);
+  }
+};
+
+const populateDb = async (req, res) => {
+  const { items } = req.body;
+  try {
+    //Ram fill
+    let findRam = await Category.findOne({
+      where: {
+        name: "RAM",
+      },
+      paranoid: false,
+    });
+    if (!findRam) {
+      findRam = await Category.create({
+        name: "RAM",
+        image:
+          "https://i.pinimg.com/originals/60/44/99/60449931da3d9581496abfc48ba39b10.jpg",
+      });
+    }
+    for (let i = 0; i < items[0].length; i++) {
+      const newArticle = await Article.create(items[0][i]);
+      await findRam.addArticle(newArticle.id);
+      await newArticle.update({ categoryId: findRam.id });
+    }
+
+    // Case Fan fill
+    let findCaseFan = await Category.findOne({
+      where: {
+        name: "Case Fans",
+      },
+      paranoid: false,
+    });
+    if (!findCaseFan) {
+      findCaseFan = await Category.create({
+        name: "Case Fans",
+        image:
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/80mm_fan.jpg/1200px-80mm_fan.jpg",
+      });
+    }
+    for (let i = 0; i < items[1].length; i++) {
+      const newArticle = await Article.create(items[1][i]);
+      await findCaseFan.addArticle(newArticle.id);
+      await newArticle.update({ categoryId: findCaseFan.id });
+    }
+
+    //Mice fill
+    let findMouse = await Category.findOne({
+      where: {
+        name: "Mice",
+      },
+      paranoid: false,
+    });
+    if (!findMouse) {
+      findMouse = await Category.create({
+        name: "Mice",
+        image:
+          "https://expertreviews.b-cdn.net/sites/expertreviews/files/2022/04/best_mouse_-_hero.jpg",
+      });
+    }
+    for (let i = 0; i < items[2].length; i++) {
+      const newArticle = await Article.create(items[2][i]);
+      await findMouse.addArticle(newArticle.id);
+      await newArticle.update({ categoryId: findMouse.id });
+    }
+
+    //keyboard fill
+    let findKeyboard = await Category.findOne({
+      where: {
+        name: "Keyboards",
+      },
+      paranoid: false,
+    });
+    if (!findKeyboard) {
+      findKeyboard = await Category.create({
+        name: "Keyboards",
+        image:
+          "https://media.wired.com/photos/636c0be61f24b6f9091f7b6c/master/w_2400,h_1800,c_limit/Roccat-Vulcan-II-Mini-Gear.jpg",
+      });
+    }
+    for (let i = 0; i < items[3].length; i++) {
+      const newArticle = await Article.create(items[3][i]);
+      await findKeyboard.addArticle(newArticle.id);
+      await newArticle.update({ categoryId: findKeyboard.id });
+    }
+
+    //CPU fan fill
+    let findCpuFan = await Category.findOne({
+      where: {
+        name: "CPU Fans",
+      },
+      paranoid: false,
+    });
+    if (!findCpuFan) {
+      findCpuFan = await Category.create({
+        name: "CPU Fans",
+        image:
+          "https://4.imimg.com/data4/UE/AS/MY-5812789/17-cpu-fan-500x500.jpg",
+      });
+    }
+    for (let i = 0; i < items[4].length; i++) {
+      const newArticle = await Article.create(items[4][i]);
+      await findCpuFan.addArticle(newArticle.id);
+      await newArticle.update({ categoryId: findCpuFan.id });
+    }
+
+    //Cases fill
+    let findCase = await Category.findOne({
+      where: {
+        name: "Cases",
+      },
+      paranoid: false,
+    });
+    if (!findCase) {
+      findCase = await Category.create({
+        name: "Cases",
+        image:
+          "https://image.made-in-china.com/2f0j00ScCYTsfyLNqk/Office-Micro-ATX-PC-Case-High-Quality-All-in-One-Computer-Case.jpg",
+      });
+    }
+    for (let i = 0; i < items[5].length; i++) {
+      const newArticle = await Article.create(items[4][i]);
+      await findCase.addArticle(newArticle.id);
+      await newArticle.update({ categoryId: findCase.id });
+    }
+
+    //Storage fill
+    let findStorage = await Category.findOne({
+      where: {
+        name: "Storage",
+      },
+      paranoid: false,
+    });
+    if (!findStorage) {
+      findStorage = await Category.create({
+        name: "Storage",
+        image:
+          "https://acf.geeknetic.es/imagenes/tutoriales/2019/1695-los-mejores-ssd-m2-nvme-sata/1695-los-mejores-ssd-m2-nvme-sata-muestra2.jpg",
+      });
+    }
+    for (let i = 0; i < items[6].length; i++) {
+      const newArticle = await Article.create(items[6][i]);
+      await findStorage.addArticle(newArticle.id);
+      await newArticle.update({ categoryId: findStorage.id });
+    }
+
+    //CPU fill
+    let findCPU = await Category.findOne({
+      where: {
+        name: "CPU",
+      },
+      paranoid: false,
+    });
+    if (!findCPU) {
+      findCPU = await Category.create({
+        name: "CPU",
+        image:
+          "https://salesystems.es/wp-content/uploads/2018/12/hardware-1200x797.jpg",
+      });
+    }
+    for (let i = 0; i < items[7].length; i++) {
+      const newArticle = await Article.create(items[7][i]);
+      await findCPU.addArticle(newArticle.id);
+      await newArticle.update({ categoryId: findCPU.id });
+    }
+
+    //GPU fill
+    let findGPU = await Category.findOne({
+      where: {
+        name: "GPU",
+      },
+      paranoid: false,
+    });
+    if (!findGPU) {
+      findGPU = await Category.create({
+        name: "GPU",
+        image:
+          "https://www.hardwaretimes.com/wp-content/uploads/2020/01/14-487-488-V01.jpg",
+      });
+    }
+    for (let i = 0; i < items[8].length; i++) {
+      const newArticle = await Article.create(items[8][i]);
+      await findGPU.addArticle(newArticle.id);
+      await newArticle.update({
+        categoryId: findGPU.id,
+      });
+    }
+
+    //Motherboard fill
+    let findMB = await Category.findOne({
+      where: {
+        name: "Motherboards",
+      },
+      paranoid: false,
+    });
+    if (!findMB) {
+      findMB = await Category.create({
+        name: "Motherboards",
+        image:
+          "https://mexx-img-2019.s3.amazonaws.com/placa-madre-msi-b660m-ddr4_42388_4.jpeg",
+      });
+    }
+    for (let i = 0; i < items[9].length; i++) {
+      const newArticle = await Article.create(items[9][i]);
+      await findMB.addArticle(newArticle.id);
+      await newArticle.update({
+        categoryId: findMB.id,
+      });
+    }
+
+    return res.status(200).json({ message: "Paso algo OwO" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json(error);
   }
 };
 
@@ -183,4 +398,5 @@ module.exports = {
   updateItem,
   deleteItem,
   restoreItem,
+  populateDb,
 };

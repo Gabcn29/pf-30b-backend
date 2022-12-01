@@ -21,8 +21,8 @@ module.exports = (sequelize) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      description: {
-        type: DataTypes.TEXT,
+      properties: {
+        type: DataTypes.JSON,
         allowNull: false,
       },
       stock: {
