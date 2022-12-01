@@ -1,4 +1,4 @@
-const { User, Factura } = require("../db.js");
+const { User, Factura, Article } = require("../db.js");
 
 const getAll = async (req, res) => {
   const usuarios = await User.findAll();
@@ -26,9 +26,14 @@ const checkGoogleFacebook = async (req, res) => {
     res.status(200).json({ created: true });
   }
 };
+const getProfile = async (req, res) => {
+  const usuario = await User.findByPk(req.params.id, { include: [Factura, Article] });
+  return res.status(200).json(usuario);
+};
 
 module.exports = {
   getAll,
   getPurchaseHistory,
   checkGoogleFacebook,
+  getProfile,
 };

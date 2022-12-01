@@ -28,7 +28,15 @@ module.exports = (sequelize) => {
         type: DataTypes.STRING,
         allowNull: false,
         defaultValue: "client",
-      }
+      },
+      avatar: { 
+        type: DataTypes.STRING, 
+        allowNull: true 
+      },
+      anthem: { 
+        type: DataTypes.STRING, 
+        allowNull: true 
+      },
     },
     {
       timestamps: false,
