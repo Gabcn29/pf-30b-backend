@@ -14,7 +14,10 @@ const modelDefiners = [];
 
 // Leemos todos los archivos de la carpeta Models, los requerimos y agregamos al arreglo modelDefiners
 fs.readdirSync(path.join(__dirname, "/models"))
-  .filter((file) => file.indexOf(".") !== 0 && file !== basename && file.slice(-3) === ".js")
+  .filter(
+    (file) =>
+      file.indexOf(".") !== 0 && file !== basename && file.slice(-3) === ".js"
+  )
   .forEach((file) => {
     modelDefiners.push(require(path.join(__dirname, "/models", file)));
   });
@@ -23,31 +26,35 @@ fs.readdirSync(path.join(__dirname, "/models"))
 modelDefiners.forEach((model) => model(sequelize));
 // Capitalizamos los nombres de los modelos ie: product => Product
 let entries = Object.entries(sequelize.models);
-let capsEntries = entries.map((entry) => [entry[0][0].toUpperCase() + entry[0].slice(1), entry[1]]);
+let capsEntries = entries.map((entry) => [
+  entry[0][0].toUpperCase() + entry[0].slice(1),
+  entry[1],
+]);
 sequelize.models = Object.fromEntries(capsEntries);
 
 // En sequelize.models están todos los modelos importados como propiedades
 // Para relacionarlos hacemos un destructuring
-const { Article } = sequelize.models;
-const { Category } = sequelize.models;
-
-const { User } = sequelize.models;
-const { Factura } = sequelize.models;
-const { Billitems } = sequelize.models;
-const { Cartitems } = sequelize.models;
+const { Article, Category, User, Factura, Billitems, Cartitems, Wishlist } =
+  sequelize.models;
 // Aca vendrian las relaciones
 // Product.hasMany(Reviews);
 
 //Para los items
 Category.belongsToMany(Article, { through: "Enrollment" });
 Article.belongsTo(Category, { through: "Enrollment" });
+
 //para las facturas
 Factura.belongsTo(User, { through: "bill" });
 User.belongsToMany(Factura, { through: "bill" });
 Factura.belongsToMany(Article, { through: Billitems });
+
 //para el carro :(
 User.belongsToMany(Article, { through: Cartitems });
 Article.belongsToMany(User, { through: Cartitems });
+
+//User > wishlist
+User.belongsToMany(Article, { through: Wishlist });
+Article.belongsTo(User, { through: Wishlist });
 
 module.exports = {
   ...sequelize.models, // para poder importar los modelos así: const { Product, User } = require('./db.js');

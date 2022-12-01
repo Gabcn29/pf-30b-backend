@@ -2,25 +2,24 @@ const { DataTypes } = require("sequelize");
 
 module.exports = (sequelize) => {
   sequelize.define(
-    "category",
+    "wishlist",
     {
       id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
       },
-      name: {
-        type: DataTypes.STRING,
+      userId: {
+        type: DataTypes.INTEGER,
         allowNull: false,
-        unique: true,
       },
-      image: {
-        type: DataTypes.STRING,
+      articleId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
       },
     },
     {
-      paranoid: true,
-      timestamps: true,
+      timestamps: true
     }
   );
 };
