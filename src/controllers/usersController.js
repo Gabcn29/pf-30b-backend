@@ -20,10 +20,10 @@ const checkGoogleFacebook = async (req, res) => {
   //asi que tenes que encontrar una combinacion que haseada de el string de sub
 
   if (check) {
-    res.status(200).json({ created: false });
+    res.status(200).json(check);
   } else {
     const newItem = await User.create({ nickname, email, password: sub });
-    res.status(200).json({ created: true });
+    res.status(200).json(newItem);
   }
 };
 const getProfile = async (req, res) => {
@@ -31,9 +31,20 @@ const getProfile = async (req, res) => {
   return res.status(200).json(usuario);
 };
 
+const updateProfile = async (req, res) => {
+  try {
+    const usuario = await User.findByPk(req.params.id);
+    await usuario.update(req.body);
+    res.status(200).json({ estado: "ok" });
+  } catch (e) {
+    res.status(500).json(e);
+  }
+};
+
 module.exports = {
   getAll,
   getPurchaseHistory,
   checkGoogleFacebook,
   getProfile,
+  updateProfile,
 };
