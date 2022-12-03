@@ -11,14 +11,15 @@ module.exports = (sequelize) => {
       },
       nickname: {
         type: DataTypes.STRING,
-        allowNull: true,
+        allowNull: false,
+        defaultValue: "UserName",
       },
       email: {
         type: DataTypes.STRING,
         allowNull: true,
         validate: {
           isEmail: true,
-        }
+        },
       },
       password: {
         type: DataTypes.STRING,
@@ -29,17 +30,15 @@ module.exports = (sequelize) => {
         allowNull: false,
         defaultValue: "client",
       },
-      avatar: { 
-        type: DataTypes.STRING, 
-        allowNull: true 
-      },
-      anthem: { 
-        type: DataTypes.STRING, 
-        allowNull: true 
+      avatar: {
+        type: DataTypes.STRING,
+        allowNull: true,
       },
     },
     {
-      timestamps: false,
+      timestamps: true,
+      createdAt: "created_date",
+      updatedAt: "updated_at",
       paranoid: true,
     }
   );
