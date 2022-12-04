@@ -30,6 +30,11 @@ module.exports = (sequelize) => {
         allowNull: false,
         defaultValue: false,
       },
+      despachada: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
     },
     {
       timestamps: true,

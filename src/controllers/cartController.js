@@ -1,9 +1,13 @@
 const { User, Article, Cartitems } = require("../db.js");
 
 const getCart = async (req, res) => {
-  const { user } = req.body;
-  const usuario = await User.findOne({ where: { email: user.email }, include: Article });
-  return res.status(200).json(usuario);
+  try {
+    const { user } = req.body;
+    const usuario = await User.findOne({ where: { email: user.email }, include: Article });
+    return res.status(200).json(usuario);
+  } catch (e) {
+    res.status(500).json(e);
+  }
 };
 
 const updateCart = async (req, res) => {
