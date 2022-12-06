@@ -1,4 +1,4 @@
-const { Article, Category } = require("../db.js");
+const { Article, Category, Review } = require("../db.js");
 const { Op } = require("sequelize");
 
 const getAll = async (req, res) => {
@@ -147,6 +147,28 @@ const deleteItem = async (req, res) => {
     return res.status(500).json(error);
   }
 };
+
+const addReview = async (req, res, next) => {
+  const {username, rating, review, image, item} = req.body
+  try {
+      if(!rating) return res.status(500).send('Se requiere establecer una puntuacion')
+      let newReview = await Review.create({
+          username,
+          rating,
+          review,
+          image,
+      })
+      let articleDb = await Article.findAll({
+          where:{ title: item }
+      })
+      
+      await articleDb.addReview(newReview)
+
+      res.send('ok')
+  } catch (error) {
+      next(error)
+  }
+} 
 
 const restoreItem = async (req, res) => {
   const { id } = req.params;
@@ -399,4 +421,5 @@ module.exports = {
   deleteItem,
   restoreItem,
   populateDb,
+  addReview,
 };
