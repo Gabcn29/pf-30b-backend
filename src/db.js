@@ -46,6 +46,8 @@ User.belongsToMany(Article, { through: Cartitems });
 Article.belongsToMany(User, { through: Cartitems });
 
 //User > wishlist
+User.belongsToMany(Article, { through: Wishlist });
+Article.belongsTo(User, { through: Wishlist });
 
 /*
 Esta relacion ya existe, crearla denuevo jode la anterior
