@@ -317,7 +317,7 @@ const populateDb = async (req, res) => {
       });
     }
     for (let i = 0; i < items[5].length; i++) {
-      const newArticle = await Article.create(items[4][i]);
+      const newArticle = await Article.create(items[5][i]);
       await findCase.addArticle(newArticle.id);
       await newArticle.update({ categoryId: findCase.id });
     }
