@@ -40,7 +40,7 @@ const getUserList = async (req, res) => {
   try {
     const findUser = await User.findByPk(id, { include: Article });
     if (findUser) {
-      return res.status(200).json(findUser);
+      return res.status(200).json(findUser.articles);
     } else {
       return res
         .status(404)
