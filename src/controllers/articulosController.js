@@ -1,4 +1,4 @@
-const { Article, Category } = require("../db.js");
+const { Article, Category, Review } = require("../db.js");
 const { Op } = require("sequelize");
 
 const getAll = async (req, res) => {
@@ -148,6 +148,28 @@ const deleteItem = async (req, res) => {
   }
 };
 
+const addReview = async (req, res, next) => {
+  const {username, rating, review, image, item} = req.body
+  try {
+      if(!rating) return res.status(500).send('Se requiere establecer una puntuacion')
+      let newReview = await Review.create({
+          username,
+          rating,
+          review,
+          image,
+      })
+      let articleDb = await Article.findAll({
+          where:{ title: item }
+      })
+      
+      await articleDb.addReview(newReview)
+
+      res.send('ok')
+  } catch (error) {
+      next(error)
+  }
+} 
+
 const restoreItem = async (req, res) => {
   const { id } = req.params;
   if (isNaN(id))
@@ -295,7 +317,7 @@ const populateDb = async (req, res) => {
       });
     }
     for (let i = 0; i < items[5].length; i++) {
-      const newArticle = await Article.create(items[5][i]);
+      const newArticle = await Article.create(items[4][i]);
       await findCase.addArticle(newArticle.id);
       await newArticle.update({ categoryId: findCase.id });
     }
@@ -399,4 +421,5 @@ module.exports = {
   deleteItem,
   restoreItem,
   populateDb,
+  addReview,
 };
