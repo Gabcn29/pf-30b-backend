@@ -7,6 +7,7 @@ const {
   deleteItem,
   restoreItem,
   populateDb,
+  createReview,
 } = require("../controllers/articulosController.js");
 
 const router = express.Router();
@@ -14,6 +15,7 @@ const router = express.Router();
 router.get("/getAll", getAll);
 router.get("/:id", getOne);
 router.post("/create", createItem);
+router.post("/addReview", createReview);
 router.put("/modify/:id", updateItem);
 router.delete("/delete/:id", deleteItem);
 router.get("/restore/:id", restoreItem);

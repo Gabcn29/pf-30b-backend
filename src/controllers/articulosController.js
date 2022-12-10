@@ -148,8 +148,8 @@ const deleteItem = async (req, res) => {
   }
 };
 
-const addReview = async (req, res, next) => {
-  const {username, rating, review, image, item} = req.body
+const createReview = async (req, res, next) => {
+  const {username, rating, review, image = "xd", item} = req.body
   try {
       if(!rating) return res.status(500).send('Se requiere establecer una puntuacion')
       let newReview = await Review.create({
@@ -159,7 +159,7 @@ const addReview = async (req, res, next) => {
           image,
       })
       let articleDb = await Article.findAll({
-          where:{ title: item }
+          where:{ id: item }
       })
       
       await articleDb.addReview(newReview)
@@ -421,5 +421,5 @@ module.exports = {
   deleteItem,
   restoreItem,
   populateDb,
-  addReview,
+  createReview,
 };
