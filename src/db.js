@@ -45,13 +45,10 @@ Factura.belongsToMany(Article, { through: Billitems });
 
 Article.belongsToMany(User, { through: Cartitems });
 User.belongsToMany(Article, { through: Cartitems });
-/*
-//User > wishlist 
+
+//User > wishlist
 User.belongsToMany(Article, { through: Wishlist });
 Article.belongsTo(User, { through: Wishlist });
-
-porque arituclos pertenece a un solo Usuario?, cambio este codigo para que funcione correctamente
-*/
 
 // Para las reseñas
 Review.belongsTo(Article, { through: "ArticleReview" });
