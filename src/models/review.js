@@ -5,23 +5,19 @@ module.exports = (sequelize) => {
     "review",
     {
       id: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
       },
       username: {
         type: DataTypes.STRING,
         allowNull: false,
-        unique: true,
       },
       review: {
         type: DataTypes.STRING,
       },
       rating: {
         type: DataTypes.INTEGER,
-        allowNull: false,
-      },
-      item: {
-        type: DataTypes.STRING,
         allowNull: false,
       },
        image: { // Podemos añadir la funcion de que los usuarios puedan adjuntar imagenes del producto junto a su review
