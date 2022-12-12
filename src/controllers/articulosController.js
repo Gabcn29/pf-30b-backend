@@ -158,17 +158,39 @@ const createReview = async (req, res, next) => {
           review,
           image,
       })
-      let articleDb = await Article.findAll({
-          where:{ id: item }
-      })
-      
+      let articleDb = await Article.findByPk(item)
+      console.log(articleDb)
       await articleDb.addReview(newReview)
+      console.log(articleDb)
 
       res.send('ok')
   } catch (error) {
       next(error)
   }
 } 
+
+const getReviews = async (req, res, next) => {
+  const { id } = req.params;
+  console.log(id)
+  if (isNaN(id))
+    return res.status(400).json({ message: "ID must be a number" });
+  try {
+    const articulo = await Article.findByPk(id);
+    const Reviews = await articulo.getReviews()
+    
+    if (Reviews) {
+      return res.status(200).json({ message: "Reviews obtained", Reviews });
+    } 
+    else {
+      return res
+        .status(404)
+        .json({ message: "No reviews found" });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json(error);
+  }
+};
 
 const restoreItem = async (req, res) => {
   const { id } = req.params;
@@ -422,4 +444,5 @@ module.exports = {
   restoreItem,
   populateDb,
   createReview,
+  getReviews,
 };
