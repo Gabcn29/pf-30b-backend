@@ -1,4 +1,4 @@
-const { User, Factura, Article } = require("../db.js");
+const { User, Factura, Article, Cartitems } = require("../db.js");
 
 const getAll = async (req, res) => {
   const usuarios = await User.findAll();
@@ -27,7 +27,15 @@ const checkGoogleFacebook = async (req, res) => {
   }
 };
 const getProfile = async (req, res) => {
-  const usuario = await User.findByPk(req.params.id, { include: [Factura, Article] });
+  const usuario = await User.findByPk(req.params.id, {
+    include: [
+      Factura,
+      {
+        model: Article,
+        through: { model: Cartitems, attributes: ["quantity"], as: "itemEnCarro" },
+      },
+    ],
+  });
   return res.status(200).json(usuario);
 };
 
