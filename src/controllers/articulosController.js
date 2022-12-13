@@ -49,11 +49,11 @@ const createItem = async (req, res) => {
   const { category } = req.body;
   try {
     const checkCategoryByPk = await Category.findByPk(category.id);
-    const checkCategoryByName = await Category.findOne({
-      where: {
-        name: category.name,
-      },
-    });
+    // const checkCategoryByName = await Category.findOne({
+    //   where: {
+    //     name: category.name,
+    //   },
+    // });
     const checkItem = await Article.findOne({
       where: {
         title: req.body.title,
@@ -64,12 +64,13 @@ const createItem = async (req, res) => {
         .status(400)
         .json({ message: "An article with that name already exists" });
     }
-    if (!checkCategoryByPk && !checkCategoryByName) {
+    if (!checkCategoryByPk ) {
       await Category.create({
         name: category.name,
         image: category.image,
       });
     }
+
     const newItem = await Article.create({
       ...req.body,
       price: parseFloat(req.body.precio),
@@ -77,7 +78,7 @@ const createItem = async (req, res) => {
 
     const articleCategory = await Category.findOne({
       where: {
-        name: category.name,
+        id: category.id,
       },
     });
     await articleCategory.addArticle(newItem.id);
