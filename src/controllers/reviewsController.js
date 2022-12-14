@@ -44,11 +44,8 @@ const getReviews = async (req, res, next) => {
 };
 
 const getAllReviews = async (req, res, next) => {
-  console.log("ayudavoyallorar");
   const AllReviews = await Review.findAll();
-  console.log(AllReviews);
   try {
-    console.log("ayudavoyallorar");
     if (AllReviews) {
       return res.status(200).json({ message: "Reviews obtained", AllReviews });
     } else {
@@ -59,6 +56,32 @@ const getAllReviews = async (req, res, next) => {
     return res.status(500).json(error);
   }
 };
+
+
+const deleteReview = async (req, res) => {
+  const { id } = req.params;
+  console.log("test")
+  console.log(id)
+  if (!id)
+    return res.status(400).json({ message: "ID is necessary" });
+  try {
+    const findReview = await Review.findOne({
+      where: {
+        id: id,
+      },
+    });
+    if (findReview) {
+      await findReview.destroy();
+      return res.status(200).json({ message: "Review deleted successfully" });
+    } else {
+      return res.status(404).json({ message: "No review found with that ID" });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json(error);
+  }
+};
+
 
 const editReview = async (req, res, next) => {
   const { id } = req.params;
@@ -112,4 +135,5 @@ module.exports = {
   getAllReviews,
   editReview,
   reportReview,
+  deleteReview,
 };
