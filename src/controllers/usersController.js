@@ -1,8 +1,15 @@
+const { Op } = require("sequelize");
 const { User, Factura, Article, Cartitems } = require("../db.js");
 
 const getAll = async (req, res) => {
   const usuarios = await User.findAll();
-  return res.status(200).json(usuarios);
+  const deletedUsers = await User.findAll({
+    where: {
+      [Op.not]: [{ deletedAt: null }],
+    },
+    paranoid: false,
+  });
+  return res.status(200).json({usuarios, deletedUsers});
 };
 
 const getPurchaseHistory = async (req, res) => {
@@ -49,10 +56,60 @@ const updateProfile = async (req, res) => {
   }
 };
 
+
+const deleteProfile = async (req, res) => {
+
+  try {
+    const deletedUser = await User.destroy({
+      where: {
+        id: req.params.id,
+      },
+    });
+
+    !deletedUser && res.status(404).send({msg: 'No se pudo eliminar'}) 
+
+    res.send({deletedUser});
+
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+};
+
+const restoreUser = async (req, res) => {
+  const { id } = req.params;
+  if (isNaN(id))
+    return res.status(400).json({ message: "ID must be a number" });
+  try {
+    const deletedUser = await User.findOne({
+      where: {
+        id: id,
+        [Op.not]: [{ deletedAt: null }],
+      },
+      paranoid: false,
+    });
+    if (deletedUser) {
+      await deletedUser.restore();
+      return res
+        .status(200)
+        .json({ message: "Article restored successfully", deletedUser });
+    } else {
+      return res.status(404).json({
+        message:
+          "Article with that ID could not be found or is already restored",
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json(error);
+  }
+};
+
 module.exports = {
   getAll,
   getPurchaseHistory,
   checkGoogleFacebook,
   getProfile,
   updateProfile,
+  deleteProfile,
+  restoreUser
 };
