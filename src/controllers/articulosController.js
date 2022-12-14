@@ -1,4 +1,4 @@
-const { Article, Category } = require("../db.js");
+const { Article, Category, Review } = require("../db.js");
 const { Op } = require("sequelize");
 
 const getAll = async (req, res) => {
@@ -49,11 +49,11 @@ const createItem = async (req, res) => {
   const { category } = req.body;
   try {
     const checkCategoryByPk = await Category.findByPk(category.id);
-    const checkCategoryByName = await Category.findOne({
-      where: {
-        name: category.name,
-      },
-    });
+    // const checkCategoryByName = await Category.findOne({
+    //   where: {
+    //     name: category.name,
+    //   },
+    // });
     const checkItem = await Article.findOne({
       where: {
         title: req.body.title,
@@ -64,12 +64,13 @@ const createItem = async (req, res) => {
         .status(400)
         .json({ message: "An article with that name already exists" });
     }
-    if (!checkCategoryByPk && !checkCategoryByName) {
+    if (!checkCategoryByPk ) {
       await Category.create({
         name: category.name,
         image: category.image,
       });
     }
+
     const newItem = await Article.create({
       ...req.body,
       price: parseFloat(req.body.precio),
@@ -77,7 +78,7 @@ const createItem = async (req, res) => {
 
     const articleCategory = await Category.findOne({
       where: {
-        name: category.name,
+        id: category.id,
       },
     });
     await articleCategory.addArticle(newItem.id);
@@ -141,6 +142,50 @@ const deleteItem = async (req, res) => {
       return res.status(200).json({ message: "Article deleted successfully" });
     } else {
       return res.status(404).json({ message: "No article found with that ID" });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json(error);
+  }
+};
+
+const createReview = async (req, res, next) => {
+  const {username, rating, review, image = "xd", item} = req.body
+  try {
+      if(!rating) return res.status(500).send('Se requiere establecer una puntuacion')
+      let newReview = await Review.create({
+          username,
+          rating,
+          review,
+          image,
+      })
+      let articleDb = await Article.findByPk(item)
+      console.log(articleDb)
+      await articleDb.addReview(newReview)
+      console.log(articleDb)
+
+      res.send('ok')
+  } catch (error) {
+      next(error)
+  }
+} 
+
+const getReviews = async (req, res, next) => {
+  const { id } = req.params;
+  console.log(id)
+  if (isNaN(id))
+    return res.status(400).json({ message: "ID must be a number" });
+  try {
+    const articulo = await Article.findByPk(id);
+    const Reviews = await articulo.getReviews()
+    
+    if (Reviews) {
+      return res.status(200).json({ message: "Reviews obtained", Reviews });
+    } 
+    else {
+      return res
+        .status(404)
+        .json({ message: "No reviews found" });
     }
   } catch (error) {
     console.log(error);
@@ -295,7 +340,7 @@ const populateDb = async (req, res) => {
       });
     }
     for (let i = 0; i < items[5].length; i++) {
-      const newArticle = await Article.create(items[4][i]);
+      const newArticle = await Article.create(items[5][i]);
       await findCase.addArticle(newArticle.id);
       await newArticle.update({ categoryId: findCase.id });
     }
@@ -399,4 +444,6 @@ module.exports = {
   deleteItem,
   restoreItem,
   populateDb,
+  createReview,
+  getReviews,
 };
