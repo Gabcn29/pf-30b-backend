@@ -1,4 +1,4 @@
-const { User, Factura, Article, Cartitems } = require("../db.js");
+const { User, Factura, Article, Cartitems, Address } = require("../db.js");
 
 const getAll = async (req, res) => {
   const usuarios = await User.findAll();
@@ -34,6 +34,7 @@ const getProfile = async (req, res) => {
         model: Article,
         through: { model: Cartitems, attributes: ["quantity"], as: "itemEnCarro" },
       },
+      Address
     ],
   });
   return res.status(200).json(usuario);

@@ -33,7 +33,7 @@ const getOne = async (req, res) => {
     } else if (deletedArticle) {
       return res
         .status(200)
-        .json({ message: "Article is deleted", deletedArticle });
+        .json({ message: "Article was deleted", deletedArticle });
     } else {
       return res
         .status(404)
