@@ -1,5 +1,7 @@
+
 const { Op } = require("sequelize");
-const { User, Factura, Article, Cartitems } = require("../db.js");
+const { User, Factura, Article, Cartitems, Address } = require("../db.js");
+
 
 const getAll = async (req, res) => {
   const usuarios = await User.findAll();
@@ -41,6 +43,7 @@ const getProfile = async (req, res) => {
         model: Article,
         through: { model: Cartitems, attributes: ["quantity"], as: "itemEnCarro" },
       },
+      Address
     ],
   });
   return res.status(200).json(usuario);
@@ -55,6 +58,17 @@ const updateProfile = async (req, res) => {
     res.status(500).json(e);
   }
 };
+/* 
+const addReport = async (req, res) => {
+  const { id } = req.body;
+  try {
+    const usuario = await User.findByPk(req.params.id);
+    await usuario.update(req.body);
+    res.status(200).json({ estado: "ok" });
+  } catch (e) {
+    res.status(500).json(e);
+  }
+}; */
 
 
 const deleteProfile = async (req, res) => {

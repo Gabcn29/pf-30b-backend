@@ -20,9 +20,15 @@ module.exports = (sequelize) => {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
-       image: { // Podemos añadir la funcion de que los usuarios puedan adjuntar imagenes del producto junto a su review
-        type: DataTypes.STRING,
+      reports: {
+        type: DataTypes.ARRAY(DataTypes.STRING),
+        allowNull: true,
       },
+      reportedBy: {
+        type: DataTypes.ARRAY(DataTypes.STRING),
+        allowNull: true,
+      },
+      
     }, 
     {
       timestamps: false,
