@@ -25,7 +25,7 @@ const checkPurchase = async (req, res) => {
     await fetch(`https://api-goerli.etherscan.io/api?module=transaction&action=gettxreceiptstatus&txhash=${factura.transaction_id}&apikey=${METAMASK_API_TOKEN}`, { method: "GET" })
       .then((data) => data.json())
       .then(async (answer) => {
-        res.status(200).json(answer);
+        res.status(200).json({ answer, factura, estado: factura.payment_status });
         if (answer.result.status === "1" && !factura.stockChanged) {
           await factura.update({ stockChanged: true });
           for (let i = 0; i < factura.articles.length; i++) {
@@ -36,7 +36,7 @@ const checkPurchase = async (req, res) => {
         if (answer.result.status === "1") factura.update({ payment_status: "approved" });
       });
   else if (factura.payment_status === "approved") {
-    res.status(200).json({ result: { status: "1" } });
+    res.status(200).json({ result: { status: "1" }, factura, estado: factura.payment_status });
   } else res.status(500).json({ error: "tu factura no existe o es de mercado pago y estas revisando metamask" });
 };
 
