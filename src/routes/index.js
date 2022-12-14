@@ -7,6 +7,7 @@ const platziApi = require("./platziApi");
 const mm = require("./mm.js");
 const cart = require("./cart.js");
 const wishlist = require("./wishlist");
+const address = require("./address")
 const router = express.Router();
 
 router.use("/articulo", articulos);
@@ -17,5 +18,6 @@ router.use("/metaMask", mm);
 router.use("/platziApi", platziApi);
 router.use("/cart", cart);
 router.use("/wishlist", wishlist);
+router.use("/address", address)
 
 module.exports = router;
