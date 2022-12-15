@@ -50,15 +50,13 @@ User.belongsToMany(Article, { through: Cartitems });
 User.belongsToMany(Article, { through: Wishlist });
 Article.belongsTo(User, { through: Wishlist });
 
-
 //User > aaddress
 User.belongsToMany(Address, { through: Address });
-Address.belongsTo(User, { through: Address })
+Address.belongsTo(User, { through: Address });
 
 // Para las reseñas
 Review.belongsTo(Article);
 Article.hasMany(Review);
-
 
 module.exports = {
   ...sequelize.models, // para poder importar los modelos así: const { Product, User } = require('./db.js');

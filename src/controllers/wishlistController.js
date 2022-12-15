@@ -39,7 +39,7 @@ const getUserList = async (req, res) => {
       },
     });
     if (findUser) {
-      return res.status(200).json(findUser);
+      return res.status(200).json(findUser.articles);
     } else {
       return res.status(404).json({ message: "User with that ID could not be found" });
     }
