@@ -19,25 +19,31 @@ const createOrder = async (req, res) => {
 };
 
 const checkPurchase = async (req, res) => {
-  const factura = await Factura.findByPk(req.params.id, { include: Article });
+  try {
+    const factura = await Factura.findByPk(req.params.id, { include: Article });
 
-  if (factura && factura.payment_method === "MetaMask" && factura.payment_status === "pending")
-    await fetch(`https://api-goerli.etherscan.io/api?module=transaction&action=gettxreceiptstatus&txhash=${factura.transaction_id}&apikey=${METAMASK_API_TOKEN}`, { method: "GET" })
-      .then((data) => data.json())
-      .then(async (answer) => {
-        res.status(200).json({ answer, factura, estado: factura.payment_status });
-        if (answer.result.status === "1" && !factura.stockChanged) {
-          await factura.update({ stockChanged: true });
-          for (let i = 0; i < factura.articles.length; i++) {
-            const articulo = await Article.findByPk(factura.articles[i].id);
-            await articulo.update({ stock: articulo.stock - factura.articles[i].billitems.quantity });
+    if (factura && factura.payment_method === "MetaMask" && factura.payment_status === "pending")
+      await fetch(`https://api-goerli.etherscan.io/api?module=transaction&action=gettxreceiptstatus&txhash=${factura.transaction_id}&apikey=${METAMASK_API_TOKEN}`, { method: "GET" })
+        .then((data) => data.json())
+        .then(async (answer) => {
+          console.log(answer);
+          res.status(200).json({ result: { status: answer.result.status === "1" ? 1 : "" }, factura, estado: factura.payment_status });
+          if (answer.result.status === "1" && !factura.stockChanged) {
+            await factura.update({ stockChanged: true });
+            for (let i = 0; i < factura.articles.length; i++) {
+              const articulo = await Article.findByPk(factura.articles[i].id);
+              await articulo.update({ stock: articulo.stock - factura.articles[i].billitems.quantity });
+            }
           }
-        }
-        if (answer.result.status === "1") factura.update({ payment_status: "approved" });
-      });
-  else if (factura.payment_status === "approved") {
-    res.status(200).json({ result: { status: "1" }, factura, estado: factura.payment_status });
-  } else res.status(500).json({ error: "tu factura no existe o es de mercado pago y estas revisando metamask" });
+          if (answer.result.status === "1") factura.update({ payment_status: "approved" });
+        });
+    else if (factura.payment_status === "approved") {
+      res.status(200).json({ result: { status: "1" }, factura, estado: factura.payment_status });
+    } else res.status(500).json({ error: "tu factura no existe o es de mercado pago y estas revisando metamask" });
+  } catch (e) {
+    console.log(e);
+    res.status(500).json(e);
+  }
 };
 
 module.exports = {
