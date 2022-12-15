@@ -35,7 +35,7 @@ const sendMail = async (userEmail, userName, itemsComprados) =>{
             <p>Su compra de ${list} fue procesada correctamente, si quíeres hacer el seguimiento de tu compra, puedes hacerlo a travez de este link: <a href="#">seguitupaquete.com</a></p>
         </div>
         <div style="margin:10px 50px 10px 50px">
-          <p>Si quíeres ver tu historial de compras puedes ir a tu perfil en:  <a href="#">monkeseebanana.com</a></p>
+          <p>Si quíeres ver tu historial de compras puedes ir a tu perfil en:  <a href="https://ecommerce-frontend-30b.vercel.app/">TiendaTech.com</a></p>
         </div>
         <p style="margin:10px 50px 10px 50px">Gracias por confiar en nosotros, esperamos disfrutes tu compra</p>
       </div>
