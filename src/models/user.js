@@ -33,6 +33,15 @@ module.exports = (sequelize) => {
       avatar: {
         type: DataTypes.STRING,
         allowNull: true,
+        default: "https://i.pinimg.com/236x/af/de/72/afde727d75f5aa585c407cd89910cb80.jpg",
+      },
+/*       reportedReviews: {
+        type: DataTypes.ARRAY,
+        allowNull: true,
+      }, */
+      email_verified: {
+        type: DataTypes.BOOLEAN,
+        default: false,
       },
     },
     {

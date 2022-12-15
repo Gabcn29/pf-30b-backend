@@ -1,8 +1,15 @@
-const { User, Factura, Article } = require("../db.js");
+const { Op } = require("sequelize");
+const { User, Factura, Article, Cartitems, Address } = require("../db.js");
 
 const getAll = async (req, res) => {
   const usuarios = await User.findAll();
-  return res.status(200).json(usuarios);
+  const deletedUsers = await User.findAll({
+    where: {
+      [Op.not]: [{ deletedAt: null }],
+    },
+    paranoid: false,
+  });
+  return res.status(200).json({ usuarios, deletedUsers });
 };
 
 const getPurchaseHistory = async (req, res) => {
@@ -12,7 +19,7 @@ const getPurchaseHistory = async (req, res) => {
 
 const checkGoogleFacebook = async (req, res) => {
   const { email, sub, nickname } = req.body;
-  const check = await User.findOne({ where: { email: email } });
+  const check = await User.findOne({ where: { email: email }, paranoid: false });
 
   //para usuarios de google y facebook auth0 no requiere que tengan usuario, porque los auntehtifica desde facebook o google respectivamente
   //asi que les creo un usuario yo con contraseña sub, que es una combinacion de numeros y letras raras unicas por usuario
@@ -27,7 +34,16 @@ const checkGoogleFacebook = async (req, res) => {
   }
 };
 const getProfile = async (req, res) => {
-  const usuario = await User.findByPk(req.params.id, { include: [Factura, Article] });
+  const usuario = await User.findByPk(req.params.id, {
+    include: [
+      Factura,
+      {
+        model: Article,
+        through: { model: Cartitems, attributes: ["quantity"], as: "itemEnCarro" },
+      },
+      Address,
+    ],
+  });
   return res.status(200).json(usuario);
 };
 
@@ -40,6 +56,58 @@ const updateProfile = async (req, res) => {
     res.status(500).json(e);
   }
 };
+/* 
+const addReport = async (req, res) => {
+  const { id } = req.body;
+  try {
+    const usuario = await User.findByPk(req.params.id);
+    await usuario.update(req.body);
+    res.status(200).json({ estado: "ok" });
+  } catch (e) {
+    res.status(500).json(e);
+  }
+}; */
+
+const deleteProfile = async (req, res) => {
+  try {
+    const deletedUser = await User.destroy({
+      where: {
+        id: req.params.id,
+      },
+    });
+
+    !deletedUser && res.status(404).send({ msg: "No se pudo eliminar" });
+
+    res.send({ deletedUser });
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+};
+
+const restoreUser = async (req, res) => {
+  const { id } = req.params;
+  if (isNaN(id)) return res.status(400).json({ message: "ID must be a number" });
+  try {
+    const deletedUser = await User.findOne({
+      where: {
+        id: id,
+        [Op.not]: [{ deletedAt: null }],
+      },
+      paranoid: false,
+    });
+    if (deletedUser) {
+      await deletedUser.restore();
+      return res.status(200).json({ message: "Article restored successfully", deletedUser });
+    } else {
+      return res.status(404).json({
+        message: "Article with that ID could not be found or is already restored",
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json(error);
+  }
+};
 
 module.exports = {
   getAll,
@@ -47,4 +115,6 @@ module.exports = {
   checkGoogleFacebook,
   getProfile,
   updateProfile,
+  deleteProfile,
+  restoreUser,
 };
